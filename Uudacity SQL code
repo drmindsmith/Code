@@ -1,0 +1,818 @@
+Final check from Unit 2 - Joins
+
+1.	Provide a table that provides the region for each sales_rep along with their associated accounts. This time only for the Midwest region. Your final table should include three columns: the region name, the sales rep name, and the account name. Sort the accounts alphabetically (A-Z) according to the account name.
+
+SELECT s.name salesrep, r.name region, a.name accountname
+FROM region r
+JOIN sales_reps s
+ON s.region_id = r.id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+ORDER BY a.name
+
+2.	Provide a table that provides the region for each sales_rep along with their associated accounts. This time only for accounts where the sales rep has a first name starting with S and in the Midwest region. Your final table should include three columns: the region name, the sales rep name, and the account name. Sort the accounts alphabetically (A-Z) according to the account name.
+
+SELECT s.name salesrep, r.name region, a.name accountname
+FROM region r
+JOIN sales_reps s
+ON s.region_id = r.id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+WHERE s.name LIKE ‘S%’
+AND r.name Like ‘Mid%’
+ORDER BY a.name
+
+SELECT r.name Region, s.name RepName, a.name Account
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+WHERE r.name = 'Midwest'
+AND s.name LIKE 'S%'
+ORDER BY a.name
+
+3.	Provide a table that provides the region for each sales_rep along with their associated accounts. This time only for accounts where the sales rep has a last name starting with K and in the Midwest region. Your final table should include three columns: the region name, the sales rep name, and the account name. Sort the accounts alphabetically (A-Z) according to the account name.
+
+SELECT r.name Region, s.name RepName, a.name Account
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+WHERE r.name = 'Midwest'
+AND s.name LIKE '% K%'
+ORDER BY a.name
+
+
+4.	Provide the name for each region for every order, as well as the account name and the unit price they paid (total_amt_usd/total) for the order. However, you should only provide the results if the standard order quantity exceeds 100. Your final table should have 3 columns: region name, account name, and unit price. In order to avoid a division by zero error, adding .01 to the denominator here is helpful total_amt_usd/(total+0.01).
+
+SELECT a.name account, r.name region, o.total_amt_usd/(o.total +0.001) unitprice
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+JOIN sales_reps
+ON sales_reps.id = a.sales_rep_id
+JOIN region r
+ON sales_reps.region_id = r.id
+WHERE  o.standard_qty >100
+ORDER BY unitprice
+
+5.	Provide the name for each region for every order, as well as the account name and the unit price they paid (total_amt_usd/total) for the order. However, you should only provide the results if the standard order quantity exceeds 100 and the poster order quantity exceeds 50. Your final table should have 3 columns: region name, account name, and unit price. Sort for the smallest unit price first. In order to avoid a division by zero error, adding .01 to the denominator here is helpful (total_amt_usd/(total+0.01).
+
+SELECT a.name account, r.name region, o.total_amt_usd/(o.total +0.001 unitprice)
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+JOIN sales_reps
+ON sales_reps.id = a.sales_rep_id
+JOIN region r
+ON sales_reps.region_id = r.id
+WHERE  o.standard_qty >100
+AND o.poster_qty > 50
+ORDER BY unitprice;
+
+6.	Provide the name for each region for every order, as well as the account name and the unit price they paid (total_amt_usd/total) for the order. However, you should only provide the results if the standard order quantity exceeds 100 and the poster order quantity exceeds 50. Your final table should have 3 columns: region name, account name, and unit price. Sort for the largest unit price first. In order to avoid a division by zero error, adding .01 to the denominator here is helpful (total_amt_usd/(total+0.01).
+
+SELECT a.name account, r.name region, o.total_amt_usd/(o.total +0.001) unitprice
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+JOIN sales_reps
+ON sales_reps.id = a.sales_rep_id
+JOIN region r
+ON sales_reps.region_id = r.id
+WHERE  o.standard_qty >100
+AND o.poster_qty > 50
+ORDER BY unitprice DESC;
+
+Theirs:
+SELECT r.name region, a.name account, o.total_amt_usd/(o.total + 0.01) unit_price
+FROM region r
+JOIN sales_reps s
+ON s.region_id = r.id
+JOIN accounts a
+ON a.sales_rep_id = s.id
+JOIN orders o
+ON o.account_id = a.id
+WHERE o.standard_qty > 100 AND o.poster_qty > 50
+ORDER BY unit_price DESC;
+
+
+
+7.	What are the different channels used by account id 1001? Your final table should have only 2 columns: account name and the different channels. You can try SELECT DISTINCT to narrow down the results to only the unique values.
+
+SELECT DISTINCT a.name, w.channel
+FROM accounts a
+JOIN web_events w
+ON w.account_id = a.id
+WHERE a.id = 1001
+
+8.	Find all the orders that occurred in 2015. Your final table should have 4 columns: occurred_at, account name, order total, and order total_amt_usd.
+
+SELECT o.occurred_at, a.name, o.total, o.total_amt_usd
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+WHERE o.occurred_at >= '2015-01-01T00:00:00.000Z'
+ORDER BY o.occurred_at;
+
+Theirs:
+SELECT o.occurred_at, a.name, o.total, o.total_amt_usd
+FROM accounts a
+JOIN orders o
+ON o.account_id = a.id
+WHERE o.occurred_at BETWEEN '01-01-2015' AND '01-01-2016'
+ORDER BY o.occurred_at DESC;
+
+Unit 3 – Aggregations
+
+Quiz: SUM first bunch
+SELECT 	SUM(poster_qty) AS Posters,
+	SUM(standard_qty) AS Standard,
+        	SUM(total_amt_usd) AS Total,
+        	SUM(standard_amt_usd) AS Standard$,
+        	SUM(gloss_amt_usd) AS Gloss$
+FROM orders
+
+MEDIAN
+SELECT *
+FROM (SELECT total_amt_usd
+   FROM orders
+   ORDER BY total_amt_usd
+   LIMIT 3457) AS Table1
+ORDER BY total_amt_usd DESC
+LIMIT 2;
+
+
+GROUP BY quiz I
+1.	Which account (by name) placed the earliest order? Your solution should have the account name and the date of the order.
+
+SELECT accounts.name, MIN(orders.occurred_at)
+FROM accounts
+JOIN orders
+ON accounts.id = orders.account_id
+GROUP BY accounts.name
+ORDER BY MIN(orders.occurred_at)
+Theirs:
+SELECT a.name, o.occurred_at
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+ORDER BY occurred_at
+LIMIT 1;
+
+2.	Find the total sales in usd for each account. You should include two columns - the total sales for each company's orders in usd and the company name.
+
+SELECT accounts.name, SUM(orders.total_amt_usd)
+FROM accounts
+JOIN orders
+ON accounts.id = orders.account_id
+GROUP BY accounts.name
+ORDER BY SUM(orders.total_amt_usd)
+
+3.	Via what channel did the most recent (latest) web_event occur, which account was associated with this web_event? Your query should return only three values - the date, channel, and account name.
+
+SELECT MAX(w.occurred_at), w.channel, accounts.name
+FROM web_events w
+JOIN accounts
+ON w.account_id = accounts.id
+GROUP BY w.channel, accounts.name
+ORDER BY MAX(w.occurred_at) DESC
+LIMIT 1
+
+Theirs:
+SELECT w.occurred_at, w.channel, a.name
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+ORDER BY w.occurred_at DESC
+LIMIT 1;
+
+
+4.	Find the total number of times each type of channel from the web_events was used. Your final table should have two columns - the channel and the number of times the channel was used.
+
+SELECT web_events.channel, COUNT(web_events.channel) as count
+FROM web_events
+GROUP BY web_events.channel
+
+Theirs:
+SELECT w.channel, COUNT(*)
+FROM web_events w
+GROUP BY w.channel
+
+5.	Who was the primary contact associated with the earliest web_event?
+
+SELECT accounts.primary_poc, MIN(web_events.occurred_at)
+FROM web_events
+JOIN accounts
+ON accounts.id = web_events.account_id
+GROUP BY accounts.primary_poc
+ORDER BY MIN(web_events.occurred_at)
+LIMIT 1;
+
+SELECT a.primary_poc
+FROM web_events w
+JOIN accounts a
+ON a.id = w.account_id
+ORDER BY w.occurred_at
+LIMIT 1;
+
+
+6.	What was the smallest order placed by each account in terms of total usd. Provide only two columns - the account name and the total usd. Order from smallest dollar amounts to largest.
+
+SELECT a.name, MIN(o.total_amt_usd) AS total$
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY total$;
+
+7.	Find the number of sales reps in each region. Your final table should have two columns - the region and the number of sales_reps. Order from the fewest reps to most reps.
+
+SELECT region.name, COUNT(sales_reps.region_id)
+FROM region
+JOIN sales_reps
+ON sales_reps.region_id = region.id
+GROUP BY region.name
+ORDER BY COUNT(sales_reps.region_id)
+
+SELECT a.name, MIN(total_amt_usd) smallest_order
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY smallest_order;
+
+GROUP BY Part II
+
+1.	For each account, determine the average amount of each type of paper they purchased across their orders. Your result should have four columns - one for the account name and one for the average quantity purchased for each of the paper types for each account.
+
+SELECT accounts.name,
+	AVG(orders.gloss_qty) gloss,
+	AVG(orders.standard_qty) standard,
+	AVG(orders.poster_qty) poster
+FROM accounts
+JOIN orders
+ON orders.account_id = accounts.id
+GROUP BY accounts.name
+ORDER BY accounts.name;
+
+Theirs:
+SELECT a.name, AVG(o.standard_qty) avg_stand, AVG(o.gloss_qty) avg_gloss, AVG(o.poster_qty) avg_post
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name;
+
+
+2.	For each account, determine the average amount spent per order on each paper type. Your result should have four columns - one for the account name and one for the average amount spent on each paper type.
+
+SELECT accounts.name,
+	AVG(orders.gloss_amt_usd) gloss,
+	AVG(orders.standard_amt_usd) standard,
+	AVG(orders.poster_amt_usd) poster
+FROM accounts
+JOIN orders
+ON orders.account_id = accounts.id
+GROUP BY accounts.name
+ORDER BY COUNT(web_events.channel) DESC
+
+Theirs:
+SELECT a.name, AVG(o.standard_amt_usd) avg_stand, AVG(o.gloss_amt_usd) avg_gloss, AVG(o.poster_amt_usd) avg_post
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name;
+
+3.	Determine the number of times a particular channel was used in the web_events table for each sales rep. Your final table should have three columns - the name of the sales rep, the channel, and the number of occurrences. Order your table with the highest number of occurrences first.
+
+SELECT sales_reps.name, web_events.channel, COUNT(web_events.channel) total
+FROM sales_reps
+JOIN accounts
+ON sales_reps.id = accounts.sales_rep_id
+JOIN web_events
+ON web_events.account_id = accounts.id
+GROUP BY sales_reps.name, web_events.channel
+ORDER BY total DESC
+
+Theirs:
+SELECT s.name, w.channel, COUNT(*) num_events
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.name, w.channel
+ORDER BY num_events DESC;
+
+
+4.	Determine the number of times a particular channel was used in the web_events table for each region. Your final table should have three columns - the region name, the channel, and the number of occurrences. Order your table with the highest number of occurrences first.
+
+SELECT region.name, web_events.channel, COUNT(web_events.channel) total
+FROM region
+JOIN sales_reps
+ON sales_reps.region_id = region.id
+JOIN accounts
+ON sales_reps.id = accounts.sales_rep_id
+JOIN web_events
+ON web_events.account_id = accounts.id
+GROUP BY region.name, web_events.channel
+ORDER BY total DESC;
+
+Theirs:
+SELECT r.name, w.channel, COUNT(*) num_events
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r
+ON r.id = s.region_id
+GROUP BY r.name, w.channel
+ORDER BY num_events DESC;
+
+1.	Use DISTINCT to test if there are any accounts associated with more than one region.
+
+SELECT DISTINCT a.name, sr.region_id
+FROM accounts a
+JOIN sales_reps sr
+ON sr.id = a.sales_rep_id
+GROUP BY a.name
+ORDER BY a.name
+
+That gives me the info, but it’s REALLY hard to use
+
+SELECT a.id as "account id", r.id as "region id",
+a.name as "account name", r.name as "region name"
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r
+ON r.id = s.region_id;
+
+And then
+SELECT DISTINCT id, name
+FROM accounts;
+ And they’re using the comparison to see if they’re the same. (They are)
+
+2.	Have any sales reps worked on more than one account?
+
+SELECT DISTINCT sales_rep_id, name
+FROM accounts
+
+And
+
+SELECT sales_rep_id, id
+FROM accounts
+GROUP BY sales_rep_id
+
+Theirs:
+SELECT s.id, s.name, COUNT(*) num_accounts
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.id, s.name
+ORDER BY num_accounts;
+
+And
+
+SELECT DISTINCT id, name
+FROM sales_reps;
+
+1.	How many of the sales reps have more than 5 accounts that they manage?
+
+SELECT a.sales_rep_id, COUNT(a.id)
+FROM accounts a
+GROUP BY sales_rep_id
+HAVING COUNT(a.id)>=5
+
+Or, to also get their names:
+
+SELECT s.name, a.sales_rep_id,  COUNT(a.id)
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY a.name,  a.sales_rep_id
+HAVING COUNT(a.id)>=5
+
+Theirs:
+SELECT s.id, s.name, COUNT(*) num_accounts
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.id, s.name
+HAVING COUNT(*) > 5
+ORDER BY num_accounts;
+
+
+2.	How many accounts have more than 20 orders?
+
+SELECT COUNT(orders.account_id) bigaccounts
+FROM orders
+HAVING bigaccounts >= 20
+
+Which seems to but fails to answer the question. But to know which accounts have 20+ orders…
+
+SELECT a.id, a.name, COUNT(*) num_orders
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING COUNT(*) > 20
+ORDER BY num_orders;
+
+
+3.	Which account has the most orders?
+
+SELECT a.name, COUNT(*)
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY COUNT(*) DESC
+LIMIT 1;
+
+4.	Which accounts spent more than 30,000 usd total across all orders?
+
+SELECT a.name, a.id, SUM(o.total_amt_usd) total
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name, a.id
+HAVING total > 30000
+ORDER BY total DESC
+
+Theirs:
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) > 30000
+ORDER BY total_spent;
+
+
+5.	Which accounts spent less than 1,000 usd total across all orders?
+
+SELECT a.name, a.id, SUM(o.total_amt_usd) total
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name, a.id
+HAVING total <= 1000
+ORDER BY total DESC
+
+6.	Which account has spent the most with us?
+
+SELECT a.id, a.name, SUM(o.total_amt_usd) spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name, a.id
+ORDER BY spent DESC
+LIMIT 1;
+
+This works, and gives us the same info for that value as 4 does, above.
+
+7.	Which account has spent the least with us?
+
+SELECT a.id, a.name, SUM(o.total_amt_usd) spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name, a.id
+ORDER BY spent
+LIMIT 1;
+
+This works, and shows the same answer as found in the small pile from my #5
+
+8.	Which accounts used facebook as a channel to contact customers more than 6 times?
+
+SELECT a.id, a.name, COUNT(w.channel) ch_uses
+FROM accounts a
+JOIN web_events w
+ON w.account_id = a.id
+GROUP BY a.id, a.name
+HAVING ch_uses > 6 AND w.channel = ‘facebook’
+ORDER BY a.name;
+
+OK – I have to sort this
+
+When counting events/values, it’s ok to just COUNT(*) if you are ALSO grouping by that value. So they recommend:
+
+SELECT a.id, a.name, w.channel, COUNT(*) ch_uses
+FROM accounts a
+JOIN web_events w
+ON w.account_id = a.id
+GROUP BY a.id, a.name, w.channel
+HAVING ch_uses > 6 AND w.channel = ‘facebook’
+ORDER BY ch_uses;
+
+
+9.	Which account used facebook most as a channel?
+
+All that but ORDER ch_uses DESC, LIMIT 1;
+
+SELECT a.id, a.name, w.channel, COUNT(*) ch_uses
+FROM accounts a
+JOIN web_events w
+ON w.account_id = a.id
+GROUP BY a.id, a.name, w.channel
+HAVING ch_uses > 6 AND w.channel = 'facebook'
+ORDER BY ch_uses DESC
+LIMIT 1;
+
+
+10.	Which channel was most frequently used by most accounts?
+
+SELECT w.channel COUNT(*) ch_uses
+FROM web_events
+GROUP BY w.channel
+ORDER BY ch_uses DESC
+LIMIT 1
+
+And they suggest:
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+ORDER BY use_of_channel DESC
+LIMIT 10;
+
+But, “most frequently by most’ is a little weird.  Their solution gives the top ten accounts using a max channel which isn’t the same thing.
+
+
+DATE functions:
+
+1.	Find the sales in terms of total dollars for all orders in each year, ordered from greatest to least. Do you notice any trends in the yearly sales totals?
+
+SELECT DATE_PART(‘year’,o.occurred_at) year, SUM(o.total_amt_usd) annual$
+FROM orders o
+GROUP BY year
+ORDER BY annual$
+
+So, this would work, except that ‘year’ is a problem in the SQL language. By changing it to order_year it works out ok.
+
+SELECT DATE_PART(‘year’, occurred_at) order_year, SUM(total_amt_usd) annual$
+FROM orders
+GROUP BY order_year
+ORDER BY annual$;
+
+Also, it shows that 2013 is weird (low) and 2017 is likely incomplete if the panel keeps going.
+SO, pop this in there:
+WHERE occurred_at BETWEEN ‘2014-01-01’ AND ‘2017-01-01’
+
+
+2.	Which month did Parch & Posey have the greatest sales in terms of total dollars? Are all months evenly represented by the dataset?
+
+SELECT DATE_PART('month', occurred_at) seqmonth, SUM(total_amt_usd) month$
+FROM orders
+GROUP BY seqmonth
+ORDER BY month$
+
+Although this seems weird – because it’s combining all the January values across all the years…
+
+SELECT DATE_PART('month', occurred_at) seqmonth, SUM(total_amt_usd) month$
+FROM orders
+WHERE occurred_at BETWEEN ‘2014-01-01’ AND ‘2017-01-01’
+GROUP BY seqmonth
+ORDER BY month$
+
+And that shows December, but still…
+
+SELECT DATE_TRUNC('month', o.occurred_at) ord_date, SUM(total_amt_usd) month$
+FROM orders o
+GROUP BY ord_date
+ORDER BY month$
+
+Shows every month’s total sales and can be used to compare ALL months, not just ‘totals of all December’
+
+3.	Which year did Parch & Posey have the greatest sales in terms of the total number of orders? Are all years evenly represented by the dataset?
+
+SELECT DATE_PART(‘year’, occurred_at) years, COUNT(*) totals
+FROM orders
+WHERE occurred_at BETWEEN ‘2014-01-01’ AND ‘2017-01-01’
+GROUP BY years
+ORDER BY totals
+4.	Which month did Parch & Posey have the greatest sales in terms of the total number of orders? Are all months evenly represented by the dataset?
+
+SELECT DATE_PART('month', occurred_at) months, COUNT(*) totals
+FROM orders
+WHERE occurred_at BETWEEN '2014-01-01' AND '2017-01-01'
+GROUP BY 1
+ORDER BY 2
+
+5.	In which month of which year did Walmart spend the most on gloss paper in terms of dollars?
+
+SELECT DATE_TRUNC(‘month’, o.occurred_at) ord_date, SUM(o.gloss_amt_usd) tot_spent
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+WHERE a.name = ‘Walmart’
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+
+CASE QUIZ questions
+
+1.	Write a query to display for each order, the account ID, the total amount of the order, and the level of the order - ‘Large’ or ’Small’ - depending on if the order is $3000 or more, or smaller than $3000.
+
+SELECT account_id, total_amt_usd, CASE WHEN total_amt_usd > 3000 THEN ‘large’ ELSE ‘small’ END as ordersize
+FROM orders
+ORDER BY account_id
+
+2.	Write a query to display the number of orders in each of three categories, based on the total number of items in each order. The three categories are: 'At Least 2000', 'Between 1000 and 2000' and 'Less than 1000'.
+
+SELECT CASE WHEN total <= 1000 THEN ‘less than 1000’
+WHEN total <=2000 THEN ‘Between 1000 and 2000’
+ELSE ‘At least 2000’ END AS order_size,
+COUNT(*) AS order_count
+FROM orders
+GROUP BY 1;
+
+3.	We would like to understand 3 different levels of customers based on the amount associated with their purchases. The top-level includes anyone with a Lifetime Value (total sales of all orders) greater than 200,000 usd. The second level is between 200,000 and 100,000 usd. The lowest level is anyone under 100,000 usd. Provide a table that includes the level associated with each account. You should provide the account name, the total sales of all orders for the customer, and the level. Order with the top spending customers listed first.
+
+SELECT a.name, SUM(total_amt_usd) total_spent,
+CASE WHEN SUM(total_amt_usd) > 2000 THEN 'top'
+ WHEN SUM(total_amt_usd) > 1000 THEN 'middle'
+ELSE 'low' END AS level
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY 2 DESC;
+
+
+4.	We would now like to perform a similar calculation to the first, but we want to obtain the total amount spent by customers only in 2016 and 2017. Keep the same levels as in the previous question. Order with the top spending customers listed first.
+
+SELECT a.name, SUM(total_amt_usd) total_spent,
+CASE WHEN SUM(total_amt_usd) > 2000 THEN 'top'
+ WHEN SUM(total_amt_usd) > 1000 THEN 'middle'
+ELSE 'low' END AS level
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+WHERE occurred_at > ‘2016-01-01’
+GROUP BY a.name
+ORDER BY 2 DESC;
+
+
+5.	We would like to identify top-performing sales reps, which are sales reps associated with more than 200 orders. Create a table with the sales rep name, the total number of orders, and a column with top or not depending on if they have more than 200 orders. Place the top salespeople first in your final table.
+
+SELECT s.name, COUNT(*), CASE WHEN COUNT(*) > 200 THEN ‘top’ ELSE ‘not’ END as group
+FROM sales_reps s
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY s.name
+ORDER BY 2 DESC;
+
+6.	The previous didn't account for the middle, nor the dollar amount associated with the sales. Management decides they want to see these characteristics represented as well. We would like to identify top-performing sales reps, which are sales reps associated with more than 200 orders or more than 750000 in total sales. The middle group has any rep with more than 150 orders or 500000 in sales. Create a table with the sales rep name, the total number of orders, total sales across all orders, and a column with top, middle, or low depending on these criteria. Place the top salespeople based on the dollar amount of sales first in your final table. You might see a few upset salespeople by this criteria!
+
+SELECT s.name, COUNT(*) num_sales, SUM(o.total_amt_usd) sales_total, CASE WHEN SUM(o.total_amt_usd) > 750000 THEN 'top' WHEN SUM(o.total_amt_usd) > 500000 THEN 'middle' ELSE 'low' END as performance
+FROM sales_reps s
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY s.name
+ORDER BY 2 DESC;
+
+SUBQUERIES
+
+Get the total events for each day for each channel – which days had the most events?
+SELECT DATE_TRUNC('day',occurred_at) AS day,
+        channel,
+        count(*) as event_count
+FROM web_events
+GROUP BY 1,2
+ORDER BY 3
+LIMIT 10
+
+Get’s me two dates with 21 events.
+
+Create a subquery that simply provides all of the data from the first query
+
+SELECT *
+FROM
+(SELECT DATE_TRUNC('day',occurred_at) AS day,
+        channel,
+        count(*) as event_count
+FROM web_events
+GROUP BY 1,2) sub
+ORDER BY 3
+
+Now – find the average number of events for each channel. Since you broke out by day earlier, this is giving you an average per day.
+
+SELECT channel, AVG(event_count)
+FROM
+(SELECT DATE_TRUNC('day',occurred_at) AS day,
+        channel,
+        count(*) as event_count
+FROM web_events
+GROUP BY 1,2) sub
+GROUP BY 1
+
+Theirs:
+SELECT channel, AVG(events) AS average_events
+FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
+                channel, COUNT(*) as events
+         FROM web_events
+         GROUP BY 1,2) sub
+GROUP BY channel
+ORDER BY 2 DESC;
+
+Subquery nested practice 4.11
+
+Use DATE_TRUNC to pull MONTH level information about the first order ever placed in the orders table
+
+SELECT DATE_TRUNC(‘month’, MIN(occurred_at)) AS month
+FROM orders
+
+Use the results of the query to find only the orders that took place in the same month and year as the first order, and then pull the average for each type of paper QTY in this month.
+
+SELECT AVG(standard_qty) std_avg, AVG(poster_qty) poster_avg, AVG(gloss_qty) glossavg
+FROM orders
+WHERE 		DATE_TRUNC('month',occurred_at) =
+		(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS month
+		FROM orders)
+
+For money totals
+SELECT SUM(total_amt_usd)
+FROM orders
+WHERE 		DATE_TRUNC('month',occurred_at) =
+		(SELECT DATE_TRUNC('month', MIN(occurred_at)) AS month
+		FROM orders)
+
+VIEWS
+
+CREATE VIEW v1
+AS
+SELECT s.id, s.name AS rep_name, r.name AS region_name
+FROM sales_reps s
+JOIN region R
+ON s.region_id = r.id
+AND r.name = ‘Northeast’;
+
+OR, another variety…
+
+CREATE VIEW V3
+AS
+SELECT channel, AVG(events) AS average_events
+FROM (SELECT DATE_TRUNC('day',occurred_at) AS day,
+                channel, COUNT(*) as events
+         FROM web_events
+         GROUP BY 1,2) sub
+GROUP BY channel
+
+Subs quiz: 4.17
+
+1.	Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales.
+
+SELECT t3.rep_name, t3.region_name, t3.total_amt
+FROM (SELECT region_name, MAX(total_amt) total_amt
+     FROM (SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+             FROM sales_reps s
+             JOIN accounts a
+             ON a.sales_rep_id = s.id
+             JOIN orders o
+             ON o.account_id = a.id
+             JOIN region r
+             ON r.id = s.region_id
+             GROUP BY 1, 2) t1
+     GROUP BY 1) t2
+JOIN (SELECT s.name rep_name, r.name region_name, SUM(o.total_amt_usd) total_amt
+     FROM sales_reps s
+     JOIN accounts a
+     ON a.sales_rep_id = s.id
+     JOIN orders o
+     ON o.account_id = a.id
+     JOIN region r
+     ON r.id = s.region_id
+     GROUP BY 1,2
+     ORDER BY 3 DESC) t3
+ON t3.region_name = t2.region_name AND t3.total_amt = t2.total_amt
+
+
+2.	For the region with the largest (sum) of sales total_amt_usd, how many total (count) orders were placed?
+SELECT v1.region_name, COUNT(o.id) order_count
+FROM
+(SELECT r.name region_name, SUM(o.total_amt_usd) total_sales
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id
+GROUP BY 1) v1
+GROUP BY 1
+ORDER BY 2, DESC
+
+3.	How many accounts had more total purchases than the account name which has bought the most standard_qty paper throughout their lifetime as a customer?
+4.	For the customer that spent the most (in total over their lifetime as a customer) total_amt_usd, how many web_events did they have for each channel?
+5.	What is the lifetime average amount spent in terms of total_amt_usd for the top 10 total spending accounts?
+6.	What is the lifetime average amount spent in terms of total_amt_usd, including only the companies that spent more per order, on average, than the average of all orders?

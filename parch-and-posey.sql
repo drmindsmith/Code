@@ -1,0 +1,3 @@
+SELECT *
+FROM Accounts
+LIMIT 1;
